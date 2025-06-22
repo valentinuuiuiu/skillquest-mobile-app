@@ -6,12 +6,13 @@ import CoursesScreen from '../screens/main/CoursesScreen';
 import ProgressScreen from '../screens/main/ProgressScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import LeaderboardScreen from '../screens/main/LeaderboardScreen';
+import AIChatScreen from '../screens/main/AIChatScreen';
 
 export type MainTabParamList = {
   Home: undefined;
   Courses: undefined;
   Progress: undefined;
-  Leaderboard: undefined;
+  AIChat: undefined;
   Profile: undefined;
 };
 
@@ -66,11 +67,11 @@ const MainTabs: React.FC = () => {
         }}
       />
       <Tab.Screen 
-        name="Leaderboard" 
-        component={LeaderboardScreen}
+        name="AIChat" 
+        component={AIChatScreen}
         options={{
           tabBarIcon: () => null, // TODO: Add icons
-          tabBarLabel: 'Leaderboard',
+          tabBarLabel: 'AI Tutor',
         }}
       />
       <Tab.Screen 

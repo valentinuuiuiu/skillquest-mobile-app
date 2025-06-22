@@ -8,6 +8,7 @@ import userSlice from './slices/userSlice';
 import coursesSlice from './slices/coursesSlice';
 import gamificationSlice from './slices/gamificationSlice';
 import progressSlice from './slices/progressSlice';
+import learningSlice from './slices/learningSlice';
 
 const persistConfig = {
   key: 'root',
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   courses: coursesSlice,
   gamification: gamificationSlice,
   progress: progressSlice,
+  learning: learningSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

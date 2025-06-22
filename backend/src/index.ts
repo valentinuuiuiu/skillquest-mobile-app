@@ -16,8 +16,8 @@ const app = express();
 app.use(helmet());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : ['http://localhost:3000', 'http://localhost:8081'],
+    ? process.env.FRONTEND_URL || 'https://skillquest.app'
+    : ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:19006'],
   credentials: true,
 }));
 

@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { API_ENDPOINTS, apiCall } from '../../services/api';
+import APP_CONFIG, { MOCK_AUTH_DATA } from '../../config/app';
 
 export interface User {
   id: string;
@@ -43,19 +45,36 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Login failed');
+      // Use mock data in development if configured or if API is not available
+      if (APP_CONFIG.USE_MOCK_DATA) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Check mock credentials
+        if (credentials.email === 'test@example.com' && credentials.password === 'password') {
+          return MOCK_AUTH_DATA;
+        } else {
+          throw new Error('Invalid credentials');
+        }
       }
       
-      const data = await response.json();
-      return data;
+      // Try real API call
+      try {
+        const data = await apiCall(API_ENDPOINTS.AUTH.LOGIN, {
+          method: 'POST',
+          body: JSON.stringify(credentials),
+        });
+        return data.data; // Extract the data part from the response
+      } catch (apiError) {
+        // Fallback to mock data if API fails in development
+        if (APP_CONFIG.DEBUG_MODE) {
+          console.warn('API call failed, using mock data:', apiError);
+          if (credentials.email === 'test@example.com' && credentials.password === 'password') {
+            return MOCK_AUTH_DATA;
+          }
+        }
+        throw apiError;
+      }
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Login failed');
     }
@@ -66,19 +85,49 @@ export const register = createAsyncThunk(
   'auth/register',
   async (credentials: RegisterCredentials, { rejectWithValue }) => {
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Registration failed');
+      // Use mock data in development if configured
+      if (APP_CONFIG.USE_MOCK_DATA) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        return {
+          user: {
+            id: '2',
+            email: credentials.email,
+            username: credentials.username,
+            subscription: 'free' as const,
+            createdAt: new Date().toISOString(),
+          },
+          token: 'mock-jwt-token',
+          refreshToken: 'mock-refresh-token',
+        };
       }
       
-      const data = await response.json();
-      return data;
+      // Try real API call
+      try {
+        const data = await apiCall(API_ENDPOINTS.AUTH.REGISTER, {
+          method: 'POST',
+          body: JSON.stringify(credentials),
+        });
+        return data.data; // Extract the data part from the response
+      } catch (apiError) {
+        // Fallback to mock data if API fails in development
+        if (APP_CONFIG.DEBUG_MODE) {
+          console.warn('API call failed, using mock data:', apiError);
+          return {
+            user: {
+              id: '2',
+              email: credentials.email,
+              username: credentials.username,
+              subscription: 'free' as const,
+              createdAt: new Date().toISOString(),
+            },
+            token: 'mock-jwt-token',
+            refreshToken: 'mock-refresh-token',
+          };
+        }
+        throw apiError;
+      }
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Registration failed');
     }
